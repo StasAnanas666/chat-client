@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import io from "socket.io-client";
+import Login from "./Components/Login";
 
 const socket = io("http://localhost:5555");
 
 function App() {
-    const [name, setName] = useState(""); //имя нашего пользователя
-    const [userId, setUserId] = useState(null); //id нашего пользователя
+    const [currentUser, setCurrentUser] = useState(null); //наш пользователь
     const [users, setUsers] = useState([]); //список пользователей
     const [selectedUser, setSelectedUser] = useState(""); //выбранный пользователь из списка, для которого загузится переписка
     const [message, setMessage] = useState(""); //отправляемое сообщение
@@ -15,15 +15,16 @@ function App() {
     useEffect(() => {
         socket.on("newMessage", (msg) => {
             setMessages((prev) => [...prev, msg]);
+            console.log(msg);
         });
         return () => socket.off("newMessage");
     }, []);
 
-    const handleLogin = (e) => {
+    const handleLogin = (e, name) => {
         e.preventDefault();
         socket.emit("checkUser", name, (response) => {
             if (response.success) {
-                setUserId(response.userId);
+                setCurrentUser({id: response.userId, name});
                 loadUsers();
             } else {
                 alert(response.error);
@@ -34,7 +35,7 @@ function App() {
     const loadUsers = () => {
         socket.emit("getUsers", (userList) => {
             //получаем полььзователей, добавляем в состояние users, кроме нашего пользователя
-            setUsers(userList.filter((user) => user !== name));
+            setUsers(userList.filter((user) => user !== currentUser.name));
         });
     };
 
@@ -43,16 +44,17 @@ function App() {
         setSelectedUser(receiverUser);
         socket.emit(
             "getMessages",
-            { userId, receiverUserName: receiverUser },
+            { userId: currentUser.id, receiverUserName: receiverUser },
             (msgList) => {
                 setMessages(msgList);
+                console.log(msgList);
             }
         );
     };
 
     const sendMessage = () => {
         socket.emit("sendMessage", {
-            senderId: userId,
+            senderid: currentUser.id,
             receiverName: selectedUser,
             message,
         });
@@ -61,77 +63,69 @@ function App() {
 
     return (
         <div className="container-fluid">
-            {!userId ? (
-                <div className="container">
-                    <div
-                        className="d-flex justify-content-center align-items-center"
-                        style={{ minHeight: "92vh" }}
-                    >
-                        <form
-                            onSubmit={handleLogin}
-                            className="d-flex justify-content-center align-items-center w-50"
-                        >
-                            <input
-                                type="text"
-                                className="form-control me-4"
-                                placeholder="Введите ваше имя..."
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                            />
-                            <button
-                                className="btn btn-outline-success"
-                                type="submit"
-                            >
-                                Войти
-                            </button>
-                        </form>
-                    </div>
-                </div>
+            {!currentUser ? (
+                //форма "авторизации"
+                <Login onLogin={handleLogin} />
             ) : (
                 <div className="row min-vh-100">
-                    <div className="col-4 px-0">
-                        <div className="app-header py-3 px-3 bg-dark text-light">
+                    <div className="col-4 px-0 bg-secondary">
+                        <div className="app-header py-3 px-3 bg-dark text-light sticky-top">
                             <h5 className="mb-3">Chat App</h5>
                         </div>
-                        <ul className="list-group my-5 px-3">
+                        {/* список пользователей */}
+                        <ul className="list-group rounded-0">
                             {users.map((user) => (
                                 <li
-                                    className="list-group-item"
+                                    className="list-group-item list-group-item-action list-group-item-dark d-flex justify-content-between align-items-start py-4 px-3"
                                     key={user}
                                     onClick={() => loadMessages(user)}
                                 >
-                                    {user}
+                                    <div className="ms-2 me-auto">
+                                        <div className="fw-bold">{user}</div>
+                                        Content for list item
+                                    </div>
+                                    <span className="badge text-bg-primary rounded-pill">
+                                        14
+                                    </span>
                                 </li>
                             ))}
                         </ul>
                     </div>
                     <div className="col-8 px-0">
                         <div
-                            className="d-flex flex-column"
-                            style={{ minHeight: "95vh" }}
+                            className="d-flex flex-column min-vh-100"
                         >
-                            <div className="chat-header px-3 py-3 bg-dark text-light">
+                            <div className="chat-header px-3 py-3 bg-dark text-light sticky-top">
                                 <h5 className="mb-3">Чат с {selectedUser}</h5>
                             </div>
+                            {/* чат с пользователем */}
                             <div className="chat-messages px-3 flex-grow-1">
-                                <ul className="list-group my-5">
-                                    {messages.map((msg, index) => (
-                                        <li
-                                            className="list-group-item"
-                                            key={index}
-                                        >
-                                            <span className="fw-bold">
-                                                {msg.senderid === userId
-                                                    ? "Вы"
-                                                    : selectedUser}
-                                                :{" "}
-                                            </span>
-                                            <span>{msg.message}</span>
-                                        </li>
-                                    ))}
-                                </ul>
+                                <div className="d-flex flex-column my-5">
+                                    {messages.map((msg, index) =>
+                                        (msg.senderid === currentUser.id ? (
+                                            <div
+                                                className="bg-primary text-light py-2 px-4 ms-auto my-2 rounded-3 border-1 d-flex flex-column"
+                                                key={index}
+                                            >
+                                                <span>{msg.message}</span>
+                                                <span style={{fontSize: "12px"}}>{msg.timestamp}</span>
+                                            </div>
+                                        ) : (
+                                            <div
+                                                className="bg-secondary text-light py-2 px-4 me-auto my-2 rounded-3 border-1 d-flex flex-column"
+                                                key={index}
+                                            >
+                                                <span className="fw-bold text-primary">
+                                                    {selectedUser}
+                                                </span>
+                                                <span>{msg.message}</span>
+                                                <span style={{fontSize: "12px"}}>{msg.timestamp}</span>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
                             </div>
-                            <div className="chat-input px-3">
+                            <div className="chat-input px-3 py-4 sticky-bottom">
                                 <input
                                     type="text"
                                     className="form-control"
