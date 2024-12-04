@@ -5,7 +5,7 @@ import UserList from "./Components/UserList";
 import Chat from "./Components/Chat";
 import AppHeader from "./Components/AppHeader";
 
-const socket = io("http://localhost:5555");
+const socket = io("https://chat-server-z3gi.onrender.com");
 
 function App() {
     const [currentUser, setCurrentUser] = useState(null); //наш пользователь
