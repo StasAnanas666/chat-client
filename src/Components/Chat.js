@@ -37,7 +37,7 @@ function Chat({socket, currentUser, selectedUser}) {
     return (
         <div className="d-flex flex-column min-vh-100">
             <div className="chat-header px-3 py-3 bg-dark text-light sticky-top">
-                <h5 className="mb-3">Чат с {selectedUser}</h5>
+                <h5 className="mb-3">{selectedUser}</h5>
             </div>
             <div className="chat-messages px-3 flex-grow-1">
                 <div className="d-flex flex-column my-5">
@@ -69,7 +69,7 @@ function Chat({socket, currentUser, selectedUser}) {
                     )}
                 </div>
             </div>
-            <div className="chat-input px-3 py-4 sticky-bottom">
+            <div className="chat-input px-3 py-4 sticky-bottom bg-dark">
                 <input
                     type="text"
                     className="form-control"

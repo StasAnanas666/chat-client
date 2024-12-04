@@ -3,6 +3,7 @@ import io from "socket.io-client";
 import Login from "./Components/Login";
 import UserList from "./Components/UserList";
 import Chat from "./Components/Chat";
+import AppHeader from "./Components/AppHeader";
 
 const socket = io("http://localhost:5555");
 
@@ -10,31 +11,35 @@ function App() {
     const [currentUser, setCurrentUser] = useState(null); //наш пользователь
     const [selectedUser, setSelectedUser] = useState(""); //выбранный пользователь из списка, для которого загузится переписка
 
-    //срабатывает после авторизации и при каждом изменении currentUser
+    //загрузка пользователя из localStorage, если есть
     useEffect(() => {
-        if(currentUser !== null) {
-            localStorage.setItem("currentUser", currentUser);
-            console.log(currentUser);
-        }
-    }, [currentUser])
-
-    useEffect(() => {
-        let user = localStorage.getItem("currentUser");
-        if(user !== null) {
+        let user = JSON.parse(localStorage.getItem("currentUser"));
+        if(user) {
             setCurrentUser(user);
-            console.log(currentUser);
         }
     }, [])
 
+    //вход в чат
     const handleLogin = (name) => {
         socket.emit("checkUser", name, (response) => {
             if (response.success) {
-                setCurrentUser({ id: response.userId, name });
+                const user = { id: response.userId, name };
+                setCurrentUser(user);
+                //запись в LocalStorage
+                localStorage.setItem("currentUser", JSON.stringify(user));
             } else {
                 alert(response.error);
             }
         });
     };
+
+    //выход из чата на страницу входа
+    const handleLogout = () => {
+        setCurrentUser(null);
+        setSelectedUser("");
+        //удаление текущего пользователя из localStorage
+        localStorage.removeItem("currentUser");
+    }
 
     const handleSelectedUser = (receiverUser) => {
         //при выборе пользователя из списка отправляем запрос на получение переписки с ним
@@ -49,9 +54,7 @@ function App() {
             ) : (
                 <div className="row min-vh-100">
                     <div className="col-4 px-0 bg-secondary">
-                        <div className="app-header py-3 px-3 bg-dark text-light sticky-top">
-                            <h5 className="mb-3">Chat App</h5>
-                        </div>
+                        <AppHeader currentUser={currentUser} onLogout={handleLogout} />
                         {/* список пользователей */}
                         <UserList
                             socket={socket}
