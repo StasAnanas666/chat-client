@@ -4,7 +4,8 @@ function Login({ onLogin }) {
     const [name, setName] = useState(""); //имя нашего пользователя
 
     const handleLogin = (e) => {
-        onLogin(e, name);
+        e.preventDefault();
+        onLogin(name);
     };
 
     return (
