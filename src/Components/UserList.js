@@ -14,7 +14,7 @@ function UserList({socket, currentUser, onSelectedUser}) {
     }, [currentUser, socket]);
 
     return (
-        <ul className="list-group rounded-0">
+        <ul className="list-group rounded-0 overflow-y-auto">
             {users.map((user) => (
                 <li
                     className="list-group-item list-group-item-action list-group-item-dark d-flex justify-content-between align-items-start py-4 px-3"

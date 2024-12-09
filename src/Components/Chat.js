@@ -39,7 +39,7 @@ function Chat({socket, currentUser, selectedUser}) {
             <div className="chat-header px-3 py-3 bg-dark text-light sticky-top">
                 <h5 className="mb-3">{selectedUser}</h5>
             </div>
-            <div className="chat-messages px-3 flex-grow-1">
+            <div className="chat-messages px-3 flex-grow-1 overflow-y-auto">
                 <div className="d-flex flex-column my-5">
                     {messages.map((msg, index) =>
                         msg.senderid === currentUser.id ? (

@@ -6,6 +6,7 @@ import Chat from "./Components/Chat";
 import AppHeader from "./Components/AppHeader";
 
 const socket = io("https://chat-server-z3gi.onrender.com");
+//const socket = io("http://localhost:5555");
 
 function App() {
     const [currentUser, setCurrentUser] = useState(null); //наш пользователь
@@ -52,7 +53,7 @@ function App() {
                 //форма "авторизации"
                 <Login onLogin={handleLogin} />
             ) : (
-                <div className="row min-vh-100">
+                <div className="row vh-100">
                     <div className="col-4 px-0 bg-secondary">
                         <AppHeader currentUser={currentUser} onLogout={handleLogout} />
                         {/* список пользователей */}
