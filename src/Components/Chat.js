@@ -1,21 +1,22 @@
 import { useState, useEffect } from "react";
+import { format } from "date-fns";
 
-function Chat({socket, currentUser, selectedUser}) {
+function Chat({ socket, currentUser, selectedUser }) {
     const [message, setMessage] = useState(""); //отправляемое сообщение
     const [messages, setMessages] = useState([]); //переписка
 
     useEffect(() => {
         //если в списке нажат пользователь - загрузить переписку с ним
-        if(selectedUser) {
+        if (selectedUser) {
             socket.emit(
-            "getMessages",
-            { userId: currentUser.id, receiverUserName: selectedUser },
-            (msgList) => {
-                setMessages(msgList);
-            }
-        );
+                "getMessages",
+                { userId: currentUser.id, receiverUserName: selectedUser },
+                (msgList) => {
+                    setMessages(msgList);
+                }
+            );
         }
-    }, [selectedUser, currentUser.id, socket])
+    }, [selectedUser, currentUser.id, socket]);
 
     //реагируем на сообщение от сервера newMessage после записи сообщения в БД, получаем его и записываем в состояние messages
     useEffect(() => {
@@ -49,7 +50,11 @@ function Chat({socket, currentUser, selectedUser}) {
                             >
                                 <span>{msg.message}</span>
                                 <span style={{ fontSize: "12px" }}>
-                                    {msg.timestamp}
+                                    {msg.timestamp &&
+                                        format(
+                                            new Date(msg.timestamp),
+                                            "dd.MM.yyyy HH:mm"
+                                        )}
                                 </span>
                             </div>
                         ) : (
@@ -62,7 +67,11 @@ function Chat({socket, currentUser, selectedUser}) {
                                 </span>
                                 <span>{msg.message}</span>
                                 <span style={{ fontSize: "12px" }}>
-                                    {msg.timestamp}
+                                    {msg.timestamp &&
+                                        format(
+                                            new Date(msg.timestamp),
+                                            "dd.MM.yyyy HH:mm"
+                                        )}
                                 </span>
                             </div>
                         )
