@@ -11,6 +11,11 @@ function UserList({socket, currentUser, onSelectedUser}) {
             setUsers(userList.filter((user) => user !== currentUser));
         });
         }
+        //реакция на событие регистрации нового пользователя в приложении(добавляем в список пользователей)
+        socket.on("newUser", (newUser) => {
+            setUsers((prev) => [...prev, newUser.name]);
+        });
+        return () => socket.off("newUser");
     }, [currentUser, socket]);
 
     return (
