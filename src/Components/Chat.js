@@ -15,6 +15,7 @@ function Chat({ socket, currentUser, selectedUser }) {
                     setMessages(msgList);
                 }
             );
+            socket.emit("markAsRead", {userId: currentUser.id, senderName: selectedUser})
         }
     }, [selectedUser, currentUser.id, socket]);
 

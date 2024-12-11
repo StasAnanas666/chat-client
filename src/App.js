@@ -59,7 +59,7 @@ function App() {
                         {/* список пользователей */}
                         <UserList
                             socket={socket}
-                            currentUser={currentUser.name}
+                            currentUser={currentUser}
                             onSelectedUser={handleSelectedUser}
                         />
                     </div>
