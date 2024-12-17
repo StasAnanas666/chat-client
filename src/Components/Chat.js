@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 
+//todo: независимая прокрутка
+//todo: при открытии чата прокрутка к последним сообщениям
+//todo: вывод статуса(онлайн/офлайн) пользователя и время последнего посещения
+
+
 function Chat({ socket, currentUser, selectedUser }) {
     const [message, setMessage] = useState(""); //отправляемое сообщение
     const [messages, setMessages] = useState([]); //переписка

@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
 
+//todo: сбрасывать счетчик непрочитанных сообщений при открытии чата
+//todo: выводить последнее сообщение под именем пользователя
+//todo: независимая прокрутка
+//todo: вывод только онлайн пользователей. офлайн отображаются, только если есть непрочитанные сообщения
+
 function UserList({socket, currentUser, onSelectedUser}) {
     const [users, setUsers] = useState([]);//список пользователей
     const [unreadMessages, setUnreadMessages] = useState({});
